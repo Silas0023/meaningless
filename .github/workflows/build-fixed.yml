@@ -1,0 +1,122 @@
+name: Build Fixed
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-config:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+
+      - name: Install dependencies
+        run: yarn install --network-timeout 100000
+
+      - name: Validate tauri.conf.json
+        run: |
+          echo "=== Checking tauri.conf.json ==="
+          cat src-tauri/tauri.conf.json | jq . > /dev/null && echo "✅ JSON syntax is valid" || echo "❌ JSON syntax error"
+          echo "=== Checking required fields ==="
+          grep -q "identifier" src-tauri/tauri.conf.json && echo "✅ identifier found" || echo "❌ identifier missing"
+          grep -q "distDir" src-tauri/tauri.conf.json && echo "✅ distDir found" || echo "❌ distDir missing"
+
+      - name: Install Tauri CLI
+        run: yarn add -D @tauri-apps/cli@latest
+
+      - name: Test Tauri commands
+        run: |
+          echo "=== Tauri version ==="
+          yarn tauri --version
+          echo "=== Tauri info ==="
+          yarn tauri info
+
+      - name: Build frontend
+        run: |
+          echo "=== Building frontend ==="
+          yarn run web:build
+          echo "=== Checking dist directory ==="
+          ls -la dist/
+
+      - name: Test Tauri build (config check only)
+        run: |
+          echo "=== Testing Tauri configuration ==="
+          cd src-tauri
+          cargo check --verbose
+          echo "=== Configuration test completed ==="
+
+  build-all:
+    needs: test-config
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install system dependencies (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+
+      - name: Install dependencies
+        run: yarn install --network-timeout 100000
+
+      - name: Install Tauri CLI
+        run: yarn add -D @tauri-apps/cli@latest
+
+      - name: Build frontend
+        run: yarn run web:build
+
+      - name: Build with Tauri Action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: fixed-v__VERSION__
+          releaseName: 'Fixed Build v__VERSION__'
+          releaseBody: 'Test build with fixed configuration.'
+          releaseDraft: true
+          prerelease: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-fixed-${{ matrix.os }}
+          path: |
+            src-tauri/target/release/bundle/**/*

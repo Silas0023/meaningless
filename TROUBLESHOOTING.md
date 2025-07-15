@@ -49,7 +49,28 @@ Error: The operation was canceled.
 - **系统依赖**：已添加 `libssl-dev` 等必要依赖
 - **Node依赖**：添加了网络超时配置 `--network-timeout 100000`
 
-### 4. 前端构建依赖问题
+### 4. tauri.conf.json 配置错误
+
+**问题描述：**
+```
+Error `tauri.conf.json` error: "identifier" is a required property
+Error `tauri.conf.json` error on "build": Additional properties are not allowed ('distDir', 'devPath' were unexpected)
+Error `tauri.conf.json` error: Additional properties are not allowed ('package', 'tauri' were unexpected)
+```
+
+**原因分析：**
+- 配置文件格式不符合Tauri v1规范
+- 属性位置错误或重复配置
+- 缺少必要的schema引用
+
+**解决方案：**
+✅ **已修复**：重新调整了 `tauri.conf.json` 的结构
+- 添加了正确的 `$schema` 引用
+- 修复了属性位置（build应在根级别）
+- 移除了重复的配置项
+- 确保identifier在bundle下正确位置
+
+### 5. 前端构建依赖问题
 
 **问题描述：**
 ```
@@ -67,7 +88,7 @@ Error No path was found. about ["/path/to/src-tauri/Cargo.toml"]
 3. **检查配置**：确认 `tauri.conf.json` 中的 `distDir` 路径正确
 4. **使用调试构建**：运行 `Debug Build` 或 `Manual Build` 获取详细信息
 
-### 5. Tauri路径错误（持续性问题）
+### 6. Tauri路径错误（持续性问题）
 
 **问题描述：**
 即使前端构建成功，仍然出现路径找不到的错误
@@ -77,7 +98,7 @@ Error No path was found. about ["/path/to/src-tauri/Cargo.toml"]
 2. **安装cargo tauri**：`cargo install tauri-cli`
 3. **检查工作目录**：确保在正确的项目根目录
 
-### 6. macOS 代码签名失败
+### 7. macOS 代码签名失败
 
 **问题描述：**
 macOS构建时代码签名相关错误
@@ -135,6 +156,7 @@ yarn tauri build
 ✅ 增加网络超时时间  
 ✅ 添加构建缓存优化  
 ✅ 完善系统依赖列表  
+✅ **修复tauri.conf.json配置错误**  
 ✅ 修复前端构建依赖问题  
 ✅ 添加Manual Build工作流（完全手动构建）  
 ✅ 增强Debug Build（多种构建方式）  
