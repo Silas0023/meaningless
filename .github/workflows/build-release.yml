@@ -88,6 +88,16 @@ jobs:
       - name: Install frontend dependencies
         run: yarn install
 
+      - name: Install Tauri CLI
+        run: yarn add -D @tauri-apps/cli@latest
+
+      - name: Build frontend first
+        run: |
+          echo "Building frontend..."
+          yarn run web:build
+          echo "Checking dist directory..."
+          ls -la dist/
+
       - name: Check code
         if: matrix.os == 'ubuntu-latest'
         run: yarn run check

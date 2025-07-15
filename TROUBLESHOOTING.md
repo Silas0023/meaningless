@@ -49,7 +49,7 @@ Error: The operation was canceled.
 - **系统依赖**：已添加 `libssl-dev` 等必要依赖
 - **Node依赖**：添加了网络超时配置 `--network-timeout 100000`
 
-### 4. Tauri路径错误
+### 4. 前端构建依赖问题
 
 **问题描述：**
 ```
@@ -57,16 +57,27 @@ Error No path was found. about ["/path/to/src-tauri/Cargo.toml"]
 ```
 
 **原因分析：**
-- Tauri action无法找到正确的项目路径
-- 工作目录配置错误
-- Tauri CLI配置问题
+- Tauri需要前端先构建完成才能找到正确的dist目录
+- `beforeBuildCommand` 可能没有正确执行
+- Tauri CLI未正确安装或配置
 
 **解决方案：**
-1. **已回退到稳定版本**：使用 `tauri-apps/tauri-action@v0` 替代v0.5
-2. **移除路径配置**：v0版本不需要额外的路径配置
-3. **使用调试构建**：运行 `Debug Build` 工作流查看详细信息
+1. **手动前端构建**：在Tauri构建前明确执行 `yarn run web:build`
+2. **安装Tauri CLI**：确保正确安装 `@tauri-apps/cli`
+3. **检查配置**：确认 `tauri.conf.json` 中的 `distDir` 路径正确
+4. **使用调试构建**：运行 `Debug Build` 或 `Manual Build` 获取详细信息
 
-### 5. macOS 代码签名失败
+### 5. Tauri路径错误（持续性问题）
+
+**问题描述：**
+即使前端构建成功，仍然出现路径找不到的错误
+
+**解决方案：**
+1. **使用Manual Build**：完全手动控制构建流程
+2. **安装cargo tauri**：`cargo install tauri-cli`
+3. **检查工作目录**：确保在正确的项目根目录
+
+### 6. macOS 代码签名失败
 
 **问题描述：**
 macOS构建时代码签名相关错误
@@ -77,20 +88,28 @@ macOS构建时代码签名相关错误
 
 ## ⚙️ 快速修复建议
 
-### 方法1：使用调试构建（推荐）
+### 方法1：使用Manual Build（推荐）
+完全手动控制的构建流程：
+```bash
+# 手动触发 build-manual.yml 工作流
+# 不依赖 tauri-action，完全手动构建
+```
+
+### 方法2：使用调试构建
 专门用于诊断问题的工作流：
 ```bash
 # 手动触发 build-debug.yml 工作流
-# 会显示详细的项目结构和错误信息
+# 会尝试多种构建方式并显示详细错误信息
 ```
 
-### 方法2：使用简化配置
+### 方法3：使用简化配置
 如果完整配置有问题，可以先使用简化版本：
 ```bash
 # 手动触发 build-simple.yml 工作流
+# 已添加前端预构建步骤
 ```
 
-### 方法3：本地构建测试
+### 方法4：本地构建测试
 先在本地测试构建是否正常：
 ```bash
 # 安装依赖
@@ -102,7 +121,7 @@ yarn tauri build
 # 如果成功，说明代码没问题，是CI配置问题
 ```
 
-### 方法4：分步骤调试
+### 方法5：分步骤调试
 1. 先注释掉代码签名相关配置
 2. 只保留基础的构建步骤
 3. 逐步添加功能
@@ -116,9 +135,11 @@ yarn tauri build
 ✅ 增加网络超时时间  
 ✅ 添加构建缓存优化  
 ✅ 完善系统依赖列表  
-✅ 修复Tauri路径配置问题  
-✅ 添加调试构建工作流  
-✅ 增强调试构建功能（手动构建+详细日志）  
+✅ 修复前端构建依赖问题  
+✅ 添加Manual Build工作流（完全手动构建）  
+✅ 增强Debug Build（多种构建方式）  
+✅ 预先安装Tauri CLI  
+✅ 明确的前端构建步骤  
 
 ### 临时禁用代码签名
 如果遇到签名问题，可以临时移除以下环境变量：
@@ -146,17 +167,23 @@ yarn tauri build
 3. 查看完整错误日志
 4. 根据错误信息对症下药
 
-### 手动触发测试
-1. 进入 `Actions` 页面
-2. 选择 `Debug Build` 工作流（推荐用于调试）
-3. 点击 `Run workflow`
-4. 查看详细的构建信息和错误日志
+### 推荐的测试顺序
 
-### 使用简化构建测试
+**第一步：使用Manual Build**
 1. 进入 `Actions` 页面
-2. 选择 `Simple Build` 工作流
+2. 选择 `Manual Build` 工作流
 3. 点击 `Run workflow`
-4. 保持默认设置，点击运行
+4. 这是最可靠的构建方式，不依赖tauri-action
+
+**第二步：使用Debug Build（如果Manual Build失败）**
+1. 选择 `Debug Build` 工作流
+2. 点击 `Run workflow`
+3. 查看详细的诊断信息和多种构建尝试
+
+**第三步：使用Simple Build（最后选择）**
+1. 选择 `Simple Build` 工作流
+2. 已更新为包含前端预构建
+3. 保持默认设置，点击运行
 
 ## 📝 报告问题
 

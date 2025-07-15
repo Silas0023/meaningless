@@ -47,20 +47,39 @@ jobs:
           echo "=== Tauri info ==="
           yarn tauri info
 
-      - name: Try manual build first
+      - name: Install Tauri CLI
         run: |
-          echo "=== Trying manual web build ==="
+          echo "=== Installing Tauri CLI ==="
+          yarn add -D @tauri-apps/cli@latest
+          echo "=== Check Tauri CLI installation ==="
+          yarn tauri --version
+
+      - name: Try manual web build
+        run: |
+          echo "=== Building frontend manually ==="
           yarn run web:build
           echo "=== Checking dist directory ==="
           ls -la dist/ || echo "dist directory not found"
+          echo "=== Checking build config ==="
+          cat src-tauri/tauri.conf.json | grep -A5 -B5 "distDir"
 
-      - name: Build with Tauri (manual)
+      - name: Try Tauri build manually
         run: |
-          echo "=== Starting manual Tauri build ==="
-          cd src-tauri
-          cargo build --verbose
+          echo "=== Trying Tauri build with yarn ==="
+          yarn tauri build --verbose
+        continue-on-error: true
 
-      - name: Build with Tauri Action
+      - name: Try Tauri build with cargo
+        run: |
+          echo "=== Installing Tauri CLI via cargo ==="
+          cargo install tauri-cli --version "^1.0"
+          echo "=== Cargo Tauri version ==="
+          cargo tauri --version
+          echo "=== Building with cargo tauri ==="
+          cargo tauri build --verbose
+        continue-on-error: true
+
+      - name: Build with Tauri Action (if manual fails)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

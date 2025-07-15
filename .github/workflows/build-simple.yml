@@ -36,6 +36,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --network-timeout 100000
 
+      - name: Install Tauri CLI
+        run: yarn add -D @tauri-apps/cli@latest
+
+      - name: Build frontend
+        run: |
+          echo "Building frontend..."
+          yarn run web:build
+          echo "Frontend build complete"
+
       - name: Tauri build
         uses: tauri-apps/tauri-action@v0
         env:

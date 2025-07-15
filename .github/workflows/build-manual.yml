@@ -1,0 +1,86 @@
+name: Manual Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install system dependencies (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+
+      - name: Install frontend dependencies
+        run: yarn install --network-timeout 100000
+
+      - name: Debug project structure
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo "=== Project root contents ==="
+          ls -la
+          echo "=== src-tauri directory ==="
+          ls -la src-tauri/
+          echo "=== Check Cargo.toml ==="
+          cat src-tauri/Cargo.toml | head -20
+          echo "=== Check tauri.conf.json ==="
+          cat src-tauri/tauri.conf.json | head -30
+
+      - name: Install Tauri CLI
+        run: |
+          echo "=== Installing Tauri CLI globally ==="
+          cargo install tauri-cli --version "^1.0"
+          echo "=== Tauri CLI version ==="
+          cargo tauri --version
+
+      - name: Build frontend
+        run: |
+          echo "=== Building frontend ==="
+          yarn run web:build
+          echo "=== Check dist directory ==="
+          ls -la dist/ || echo "No dist directory found"
+
+      - name: Build with cargo tauri
+        run: |
+          echo "=== Building with cargo tauri ==="
+          cd src-tauri
+          cargo tauri build --verbose
+
+      - name: Check build output
+        run: |
+          echo "=== Build output location ==="
+          find src-tauri/target -name "*.msi" -o -name "*.dmg" -o -name "*.deb" -o -name "*.AppImage" || echo "No installers found"
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-${{ matrix.os }}
+          path: |
+            src-tauri/target/release/bundle/**/*
+            src-tauri/target/debug/bundle/**/*
