@@ -45,28 +45,7 @@ jobs:
           yarn run web:build
           echo "Frontend build complete"
 
-      - name: Debug Tauri setup
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "Contents of current directory:"
-          ls -la
-          echo "Contents of src-tauri directory:"
-          ls -la src-tauri/ || echo "src-tauri directory not found"
-          echo "Looking for Cargo.toml:"
-          find . -name "Cargo.toml" -type f
-          echo "Checking if src-tauri/Cargo.toml exists:"
-          if [ -f "src-tauri/Cargo.toml" ]; then
-            echo "src-tauri/Cargo.toml exists"
-          else
-            echo "src-tauri/Cargo.toml does not exist"
-          fi
-          echo "Checking Tauri CLI version:"
-          yarn tauri --version
-          echo "Checking .gitignore for src-tauri exclusions:"
-          grep -n "src-tauri" .gitignore || echo "No src-tauri entries in .gitignore"
-          
       - name: Tauri build
         run: |
           echo "Building with yarn tauri build..."
-          yarn tauri build --verbose 
+          yarn tauri build 
