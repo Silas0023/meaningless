@@ -106,6 +106,8 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
+          projectPath: '.'
+          tauriScript: yarn tauri
           args: --target aarch64-apple-darwin
 
       - name: Build the app (other platforms)
@@ -121,6 +123,9 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          projectPath: '.'
+          tauriScript: yarn tauri
 
       - name: Build portable version (Windows only)
         if: matrix.platform == 'windows-x86_64'
