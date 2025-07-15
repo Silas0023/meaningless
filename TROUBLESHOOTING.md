@@ -20,13 +20,16 @@ Error: The operation was canceled.
 2. **重新运行**：在GitHub Actions页面点击 "Re-run failed jobs"
 3. **检查网络**：等待一段时间后重试，可能是GitHub服务临时问题
 
-### 2. Rust 版本问题
+### 2. Tauri Action 版本兼容性
 
 **问题描述：**
-Rust版本显示异常（如1.88.0这种未来版本）
+- tauri-action@v0.5 在某些情况下有路径解析问题
+- 出现 "No path was found" 错误
+- Rust版本显示异常（如1.88.0这种未来版本）
 
 **解决方案：**
-已更新配置明确指定工具链版本：
+1. **版本回退**：使用更稳定的 `tauri-apps/tauri-action@v0`
+2. **Rust工具链**：明确指定工具链版本：
 ```yaml
 - name: Setup Rust
   uses: dtolnay/rust-toolchain@stable
@@ -59,12 +62,9 @@ Error No path was found. about ["/path/to/src-tauri/Cargo.toml"]
 - Tauri CLI配置问题
 
 **解决方案：**
-已在配置中添加明确的路径设置：
-```yaml
-with:
-  projectPath: '.'
-  tauriScript: yarn tauri
-```
+1. **已回退到稳定版本**：使用 `tauri-apps/tauri-action@v0` 替代v0.5
+2. **移除路径配置**：v0版本不需要额外的路径配置
+3. **使用调试构建**：运行 `Debug Build` 工作流查看详细信息
 
 ### 5. macOS 代码签名失败
 
@@ -111,13 +111,14 @@ yarn tauri build
 
 ### 已修复的问题
 ✅ 添加构建超时设置（60分钟）  
-✅ 更新tauri-action版本到v0.5  
+✅ 回退到稳定的tauri-action@v0版本  
 ✅ 优化Rust工具链配置  
 ✅ 增加网络超时时间  
 ✅ 添加构建缓存优化  
 ✅ 完善系统依赖列表  
 ✅ 修复Tauri路径配置问题  
 ✅ 添加调试构建工作流  
+✅ 增强调试构建功能（手动构建+详细日志）  
 
 ### 临时禁用代码签名
 如果遇到签名问题，可以临时移除以下环境变量：

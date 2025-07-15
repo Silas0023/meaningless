@@ -47,7 +47,26 @@ jobs:
           echo "=== Tauri info ==="
           yarn tauri info
 
-      - name: Build with Tauri
+      - name: Try manual build first
         run: |
-          echo "=== Starting Tauri build ==="
-          yarn tauri build --verbose 
+          echo "=== Trying manual web build ==="
+          yarn run web:build
+          echo "=== Checking dist directory ==="
+          ls -la dist/ || echo "dist directory not found"
+
+      - name: Build with Tauri (manual)
+        run: |
+          echo "=== Starting manual Tauri build ==="
+          cd src-tauri
+          cargo build --verbose
+
+      - name: Build with Tauri Action
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: debug-v__VERSION__
+          releaseName: 'Debug v__VERSION__'
+          releaseBody: 'Debug build for troubleshooting.'
+          releaseDraft: true
+          prerelease: true 

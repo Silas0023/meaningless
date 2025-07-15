@@ -94,7 +94,7 @@ jobs:
 
       - name: Build the app (macOS aarch64)
         if: matrix.platform == 'macos-aarch64'
-        uses: tauri-apps/tauri-action@v0.5
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -106,13 +106,11 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
-          projectPath: '.'
-          tauriScript: yarn tauri
           args: --target aarch64-apple-darwin
 
       - name: Build the app (other platforms)
         if: matrix.platform != 'macos-aarch64'
-        uses: tauri-apps/tauri-action@v0.5
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -123,9 +121,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        with:
-          projectPath: '.'
-          tauriScript: yarn tauri
+
 
       - name: Build portable version (Windows only)
         if: matrix.platform == 'windows-x86_64'
