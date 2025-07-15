@@ -1,64 +1,81 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
-  "productName": "一键连加速器",
-  "version": "1.4.0",
-  "identifier": "com.radnb.client",
   "build": {
     "beforeBuildCommand": "yarn run web:build",
     "beforeDevCommand": "yarn run web:dev",
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:3000"
+    "devPath": "http://localhost:3000",
+    "distDir": "../dist"
   },
-  "app": {
-    "windows": [
-      {
-        "title": "一键连加速器",
-        "width": 800,
-        "height": 600
+  "package": {
+    "productName": "一键连加速器",
+    "version": "1.4.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": true,
+        "open": true
+      },
+      "window": {
+        "all": true,
+        "close": true,
+        "hide": true,
+        "show": true,
+        "maximize": true,
+        "minimize": true,
+        "unmaximize": true,
+        "unminimize": true,
+        "startDragging": true
+      },
+      "process": {
+        "all": true,
+        "exit": true
+      },
+      "globalShortcut": {
+        "all": true
       }
-    ],
-    "security": {
-      "csp": "script-src 'unsafe-eval' 'self' https://app.chatwoot.com; default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'; img-src data: 'self' https://* data:; img-src 'self' https://* data:;"
-    }
-  },
-  "bundle": {
-    "active": true,
-    "category": "DeveloperTool",
-    "copyright": "© 2022 zzzgydi All Rights Reserved",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/app.icns",
-      "icons/icon.ico"
-    ],
-    "longDescription": "A Clash GUI based on tauri.",
-    "resources": ["resources"],
-    "shortDescription": "A Clash GUI based on tauri.",
-    "targets": "all",
-    "externalBin": ["sidecar/clash"],
-    "linux": {
+    },
+    "bundle": {
+      "active": true,
+      "category": "DeveloperTool",
+      "copyright": "© 2022 zzzgydi All Rights Reserved",
+      "identifier": "com.radnb.client",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/app.icns",
+        "icons/icon.ico"
+      ],
+      "longDescription": "A Clash GUI based on tauri.",
+      "resources": ["resources"],
+      "shortDescription": "A Clash GUI based on tauri.",
+      "targets": "all",
+      "externalBin": ["sidecar/clash"],
       "deb": {
         "depends": ["openssl"]
+      },
+      "macOS": {
+        "frameworks": [],
+        "minimumSystemVersion": "",
+        "exceptionDomain": "",
+        "signingIdentity": null,
+        "entitlements": null
+      },
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": "",
+        "wix": {
+          "language": ["zh-CN", "en-US"]
+        }
       }
     },
-    "macOS": {
-      "frameworks": [],
-      "minimumSystemVersion": "",
-      "exceptionDomain": "",
-      "signingIdentity": null,
-      "entitlements": null
+    "systemTray": {
+      "iconPath": "icons/tray-icon.ico",
+      "iconAsTemplate": true
     },
-    "windows": {
-      "certificateThumbprint": null,
-      "digestAlgorithm": "sha256",
-      "timestampUrl": "",
-      "wix": {
-        "language": ["zh-CN", "en-US"]
-      }
-    }
-  },
-  "plugins": {
     "updater": {
       "active": true,
       "endpoints": [
@@ -67,6 +84,10 @@
       ],
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDExNUFBNTBBN0FDNEFBRTUKUldUbHFzUjZDcVZhRVRJM25NK3NkSFlFVElxUkNZMzZ6bHUwRVJjb2F3alJXVzRaeDdSaTA2YWYK"
+    },
+    "windows": [],
+    "security": {
+      "csp": "script-src 'unsafe-eval' 'self' https://app.chatwoot.com; default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self'; img-src data: 'self' https://* data:; img-src 'self' https://* data:;"
     }
   }
 }
