@@ -45,18 +45,20 @@ jobs:
           yarn run web:build
           echo "Frontend build complete"
 
-      - name: Debug directory structure
+      - name: Debug Tauri setup
         run: |
           echo "Current directory:"
           pwd
           echo "Contents of current directory:"
           ls -la
           echo "Contents of src-tauri directory:"
-          ls -la src-tauri/
+          ls -la src-tauri/ || echo "src-tauri directory not found"
           echo "Looking for Cargo.toml:"
           find . -name "Cargo.toml" -type f
+          echo "Checking Tauri CLI version:"
+          yarn tauri --version
           
       - name: Tauri build
         run: |
           echo "Building with yarn tauri build..."
-          yarn tauri build 
+          yarn tauri build --verbose 
