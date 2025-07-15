@@ -4,13 +4,13 @@
     "beforeBuildCommand": "yarn run web:build",
     "beforeDevCommand": "yarn run web:dev",
     "devPath": "http://localhost:3000",
-    "distDir": "../dist",
-    "withGlobalTauri": false
+    "distDir": "../dist"
   },
   "package": {
     "productName": "一键连加速器",
     "version": "1.4.0"
   },
+  "identifier": "com.radnb.client",
   "tauri": {
     "bundle": {
       "active": true,
