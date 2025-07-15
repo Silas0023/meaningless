@@ -10,7 +10,6 @@
     "productName": "一键连加速器",
     "version": "1.4.0"
   },
-  "identifier": "com.radnb.client",
   "tauri": {
     "bundle": {
       "active": true,
@@ -67,8 +66,7 @@
       },
       "process": {
         "all": true,
-        "exit": true,
-        "restart": true
+        "exit": true
       },
       "globalShortcut": {
         "all": true
