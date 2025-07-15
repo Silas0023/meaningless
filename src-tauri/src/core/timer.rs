@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::feat;
 use anyhow::{Context, Result};
-use delay_timer::prelude::{DelayTimer, DelayTimerBuilder, TaskBuilder};
+use delay_timer::prelude::*;
 use once_cell::sync::OnceCell;
 use parking_lot::Mutex;
 use std::collections::HashMap;
@@ -159,7 +159,13 @@ impl Timer {
             .set_maximum_parallel_runnable_num(1)
             .set_frequency_repeated_by_minutes(minutes)
             // .set_frequency_repeated_by_seconds(minutes) // for test
-            .spawn_async_routine(move || Self::async_task(uid.to_owned()))
+            .spawn_routine(move || {
+                let uid = uid.to_owned();
+                let rt = tokio::runtime::Runtime::new().unwrap();
+                rt.block_on(async {
+                    Self::async_task(uid).await;
+                });
+            })
             .context("failed to create timer task")?;
 
         delay_timer
