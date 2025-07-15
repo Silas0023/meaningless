@@ -1,0 +1,41 @@
+{
+  "build": {
+    "beforeBuildCommand": "yarn run web:build",
+    "beforeDevCommand": "yarn run web:dev",
+    "devPath": "http://localhost:3000",
+    "distDir": "../dist"
+  },
+  "package": {
+    "productName": "一键连加速器",
+    "version": "1.4.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": true
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.radnb.client",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/app.icns",
+        "icons/icon.ico"
+      ]
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "height": 600,
+        "resizable": true,
+        "title": "一键连加速器",
+        "width": 800
+      }
+    ]
+  }
+}
