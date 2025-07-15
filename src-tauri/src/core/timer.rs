@@ -159,7 +159,7 @@ impl Timer {
             .set_maximum_parallel_runnable_num(1)
             .set_frequency_repeated_by_minutes(minutes)
             // .set_frequency_repeated_by_seconds(minutes) // for test
-            .spawn_routine(move || {
+            .build(move || {
                 let uid = uid.to_owned();
                 let rt = tokio::runtime::Runtime::new().unwrap();
                 rt.block_on(async {
