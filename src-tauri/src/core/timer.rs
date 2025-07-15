@@ -159,13 +159,7 @@ impl Timer {
             .set_maximum_parallel_runnable_num(1)
             .set_frequency_repeated_by_minutes(minutes)
             // .set_frequency_repeated_by_seconds(minutes) // for test
-            .build(move || {
-                let uid = uid.to_owned();
-                let rt = tokio::runtime::Runtime::new().unwrap();
-                rt.block_on(async {
-                    Self::async_task(uid).await;
-                });
-            })
+            .spawn_async_routine(move || Self::async_task(uid.to_owned()))
             .context("failed to create timer task")?;
 
         delay_timer
