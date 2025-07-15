@@ -1,0 +1,294 @@
+body {
+  background-image: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+}
+
+.the-logo {
+  // background-image: url("../image/haha_png.png");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: center;
+  max-height: 90px;
+  flex: 0 1 90px;
+  max-width: 150px;
+  // max-width: 2227px;
+}
+.layout {
+  width: 100%;
+  height: 100vh;
+  // opacity: 0.4;
+  display: flex;
+  overflow: hidden;
+  background: rgba(16 18 27 / 40%) !important;
+  // background: rgba(16 18 27 / 40%);
+  transition: 0.3s ease;
+  // -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  // background-image: url("../image/glassmorphism-background.jpg");
+
+  &__left {
+    flex: 1 0 25%;
+    display: flex;
+    height: 100%;
+    max-width: 240px;
+    min-width: 125px;
+    padding: 16px 0 8px;
+    flex-direction: column;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    overflow: hidden;
+
+    $maxLogo: 100px;
+
+    .the-logo {
+      position: relative;
+      width: 100%;
+      // flex: 0 1 $maxLogo;
+      // width: 100%;
+      // width: $maxLogo;
+      // height: $maxLogo;
+      margin: 0 auto;
+      // // padding: 0 16px;
+      // text-align: center;
+      // box-sizing: border-box;
+      // // background-color: red;
+      // // background-image: url("../image/1024.png");
+      // background-size: 100%;
+      // border-radius: 10px;
+      // img,
+      // svg {
+      //   width: 100%;
+      //   height: 100%;
+      //   pointer-events: none;
+      // }
+
+      .the-newbtn {
+        position: absolute;
+        right: 10px;
+        bottom: 0px;
+        transform: scale(0.8);
+      }
+    }
+
+    .the-menu {
+      flex: 1 1 80%;
+      overflow-y: auto;
+      margin-bottom: 8px;
+    }
+
+    .the-traffic {
+      flex: 0 0 20px;
+
+      > div {
+        margin: 0 auto;
+      }
+    }
+  }
+
+  &__right {
+    position: relative;
+    flex: 1 1 75%;
+    height: 100%;
+
+    .the-bar {
+      position: absolute;
+      top: 2px;
+      right: 8px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      z-index: 2;
+    }
+
+    .the-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  }
+}
+
+.linux,
+.windows,
+.unknown {
+  &.layout {
+    $maxLogo: 115px;
+    .layout__left .the-logo {
+      flex: 0 1 $maxLogo;
+      max-width: $maxLogo + 32px;
+      max-height: $maxLogo;
+    }
+
+    .layout__right .the-content {
+      top: 30px;
+    }
+  }
+}
+
+.macos {
+  &.layout {
+    .layout__left {
+      padding-top: 24px;
+    }
+    .layout__right .the-content {
+      top: 20px;
+      .app-status-warp {
+        height: calc(100vh - 585px) !important;
+      }
+    }
+  }
+}
+
+.connect-inner {
+  display: flex;
+  height: calc(100% - 45px);
+  box-sizing: border-box;
+  margin-left: 10px;
+  .right-1 {
+    height: 100%;
+    margin-right: 15px;
+    // flex: 1;
+    // border-radius: 0px 10px 10px 0px;
+    // background-image: url('../image/map.svg');
+    // background-size: 140%;
+    // background-position: 50%;
+    // background-repeat: no-repeat;
+    // position: relative;
+    // display: flex;
+    // justify-content: center;
+    // font-size: 16px;
+    // background-color: var(--content-bg);
+    // border-radius: 14px;
+    // border: 1px solid var(--theme-bg-color);
+    // padding: 20px;
+    // cursor: pointer;
+    // transition: 0.3s ease;
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    // height: 100%;
+    // margin-right: 10px;
+  }
+}
+
+// app-detail-wa
+.app-detail-warp {
+  // margin-top: 15px;
+  /* background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%); */
+  width: calc(100% - 60px);
+  height: calc(100% - 60px);
+  /* background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%); */
+  padding: 10px;
+  border-radius: 10px;
+  /* box-shadow: 12px 15px 20px 0 rgb(46 61 73 / 50%); */
+  // display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  // display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-gap: 10px;
+}
+
+.app-item {
+  height: 125px;
+  width: 125px;
+  background: #333;
+  font-size: 0;
+  color: #ffffff;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 5px 2px 20px 0 rgb(46 61 73 / 50%);
+  /* background-image: url('./assets/Netflix-Logo-2006-768x512.png'); */
+  background-size: 80% 80%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  margin-bottom: 10px;
+}
+
+.app-detail-item {
+  /* display: flex;
+  justify-content: center; */
+  color: var(--theme-color);
+  text-align: center;
+  width: 125px;
+  img {
+    display: block;
+    width: 80%;
+  }
+}
+.app-item {
+  position: relative;
+  top: 0;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--theme-color);
+  font-size: 2.5em;
+  margin: 0 auto;
+  /* border: 1px solid rgba(255,255,255,0.4); */
+  /* border-right: 1px solid rgba(255,255,255,0.2); */
+  /* border-bottom: 1px solid rgba(255,255,255,0.2); */
+  border-radius: 10px;
+  background: rgb(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  z-index: 1;
+  box-shadow: 0 5px 45px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  overflow: hidden;
+  transition: top 0.5s, z-index 0s, transform 0.5s;
+  transition-delay: 0.5s, 0.5s, 0s;
+  height: 100px;
+  width: 100px;
+  background: #333;
+  font-size: 0;
+  color: #ffffff;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 5px 2px 20px 0 rgb(46 61 73 / 50%);
+  /* background-image: url('./assets/Netflix-Logo-2006-768x512.png'); */
+  background-size: 80% 80%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  margin-bottom: 10px;
+}
+.app-item:hover {
+  /* transition-delay: 0s, 0.5s, 0.5s; */
+  /* top: -10px; */
+  transform: translateY(-20px);
+  z-index: 11;
+}
+
+.speed-bottom .app-item:hover {
+  /* transition-delay: 0s, 0.5s, 0.5s; */
+  /* top: -10px; */
+  transform: translateY(0px);
+  z-index: 11;
+}
+.app-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: skewX(45deg) translateX(150px);
+  transition: 0.5s;
+}
+.app-item:hover::before {
+  transform: skewX(45deg) translateX(-150px);
+}

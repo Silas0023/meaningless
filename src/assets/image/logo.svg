@@ -1,0 +1,7 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" version="1.1" width="575" height="575" viewBox="0 0 575 575"><defs><linearGradient x1="0.5" y1="1" x2="0.5" y2="0.006438320968300104" id="master_svg0_1_95"><stop offset="0%" stop-color="#71FFB1" stop-opacity="1"/><stop offset="50%" stop-color="#488AFF" stop-opacity="1"/><stop offset="100%" stop-color="#C65AFF" stop-opacity="1"/></linearGradient></defs><g><rect x="0" y="0" width="575" height="575" rx="100" fill="url(#master_svg0_1_95)" fill-opacity="1"/></g>
+
+<defs><linearGradient x1="2.220446049250313e-16" y1="0.5" x2="1" y2="0.5" id="master_svg0_1_98"><stop offset="0%" stop-color="#FFF466" stop-opacity="1"/><stop offset="50%" stop-color="#FF4A64" stop-opacity="1"/><stop offset="100%" stop-color="#FF29B3" stop-opacity="1"/></linearGradient></defs><g
+transform="translate(120, 120)"
+><path d="M125.129,0L378.496,162.89L78.0389,96.7712L125.129,0ZM97.9558,158.891L378.496,162.89L78.0389,104.768L97.9558,158.891ZM50.94,166.962L0,289.351L378.496,162.89L50.94,166.962Z" fill="url(#master_svg0_1_98)" fill-opacity="1"/></g>
+</svg>

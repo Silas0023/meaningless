@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="shortcut icon"
+      href="./assets/image/logo.ico"
+      type="image/x-icon"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>一键连加速器</title>
+    <script>
+      (function () {
+        var _matchMedia = window.matchMedia;
+        window.matchMedia = function () {
+          var v = _matchMedia.apply(null, arguments);
+          if (!v.addEventListener) {
+            v.addEventListener = function () {
+              if (arguments.length < 2 || arguments[0] !== "change") {
+                console.error("Cannot proxy addEventListener:", arguments);
+                return;
+              }
+              if (arguments.length > 2) {
+                console.warn("Proxy addEventListener:", arguments);
+              }
+              v.addListener(arguments[1]);
+            };
+          }
+          return v;
+        };
+      })();
+    </script>
+    <!-- <script type="text/javascript">
+      CRISP_RUNTIME_CONFIG = {
+        locale: "zh",
+      };
+      window.$crisp = [];
+      window.CRISP_WEBSITE_ID = "97476dce-3aea-4acc-bed9-b5127b8f3f3a";
+      (function () {
+        d = document;
+        s = d.createElement("script");
+        s.src = "https://client.crisp.chat/l.js";
+        s.async = 1;
+        d.getElementsByTagName("head")[0].appendChild(s);
+      })();
+    </script> -->
+
+    <!-- <script>
+      (function (d, t) {
+        var BASE_URL = "https://app.chatwoot.com";
+        var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+        g.src = BASE_URL + "/packs/js/sdk.js";
+        g.defer = true;
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
+        g.onload = function () {
+          window.chatwootSDK.run({
+            websiteToken: "fFhHDEjaDXGwQrxeDhHKJHp4",
+            baseUrl: BASE_URL,
+          });
+        };
+      })(document, "script");
+    </script> -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,216 @@
+name: Build Release
+
+on:
+  # 手动触发
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.4.0)'
+        required: true
+        default: 'v1.4.0'
+      pre_release:
+        description: 'Is this a pre-release?'
+        required: false
+        default: false
+        type: boolean
+  
+  # 推送标签时自动触发
+  push:
+    tags:
+      - 'v*'
+  
+  # PR时也可以构建（但不发布）
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+
+jobs:
+  build:
+    name: Build for ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows x64
+          - platform: 'windows-x86_64'
+            os: 'windows-latest'
+            rust_target: 'x86_64-pc-windows-msvc'
+          
+          # macOS Intel
+          - platform: 'macos-x86_64'
+            os: 'macos-latest'
+            rust_target: 'x86_64-apple-darwin'
+          
+          # macOS Apple Silicon
+          - platform: 'macos-aarch64'
+            os: 'macos-latest'
+            rust_target: 'aarch64-apple-darwin'
+          
+          # Linux x64
+          - platform: 'linux-x86_64'
+            os: 'ubuntu-latest'
+            rust_target: 'x86_64-unknown-linux-gnu'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libgtk-3-dev
+
+      - name: Install frontend dependencies
+        run: yarn install
+
+      - name: Check code
+        if: matrix.os == 'ubuntu-latest'
+        run: yarn run check
+
+      - name: Build the app (macOS aarch64)
+        if: matrix.platform == 'macos-aarch64'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          args: --target aarch64-apple-darwin
+
+      - name: Build the app (other platforms)
+        if: matrix.platform != 'macos-aarch64'
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Build portable version (Windows only)
+        if: matrix.platform == 'windows-x86_64'
+        run: |
+          yarn build
+          yarn run portable
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          VITE_WIN_PORTABLE: 1
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-artifacts
+          path: |
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.dmg
+            src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.app.tar.gz
+            src-tauri/target/aarch64-apple-darwin/release/bundle/**/*.dmg
+            src-tauri/target/aarch64-apple-darwin/release/bundle/**/*.app.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          release_name: 'Release ${{ steps.version.outputs.VERSION }}'
+          body: |
+            ## 🚀 新版本发布
+
+            ### 更新内容
+            - 性能优化和错误修复
+            - 用户体验改进
+
+            ### 支持平台
+            - ✅ Windows (x64)
+            - ✅ macOS (Intel & Apple Silicon)
+            - ✅ Linux (x64)
+
+            ### 安装说明
+            1. **Windows**: 下载 `.msi` 文件进行安装
+            2. **macOS**: 下载 `.dmg` 文件进行安装
+            3. **Linux**: 下载 `.deb` (Debian/Ubuntu) 或 `.AppImage` (通用) 文件
+
+            ### 校验文件
+            所有文件都经过数字签名，请验证文件完整性后安装。
+          draft: false
+          prerelease: ${{ github.event.inputs.pre_release || false }}
+
+      - name: Upload Release Assets
+        run: |
+          find ./artifacts -type f \( -name "*.msi" -o -name "*.dmg" -o -name "*.deb" -o -name "*.AppImage" -o -name "*.app.tar.gz" \) -exec gh release upload ${{ steps.version.outputs.VERSION }} {} \;
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate updater files
+        run: yarn run updater
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
